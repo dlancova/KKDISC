@@ -25,7 +25,7 @@ rd=RINNER;
 alphav=ALPHA_DISC;
 rhoc=RHO_EPS * RHO_DISC_MAX;
 
-coeff=RHO_DISC_MAX*2./5./eps2*(1./r-(1.-5./2.*eps2)/rcyl);
+coeff=RHO_DISC_MAX*2./5./eps2*(RINNER/r-(1.-5./2.*eps2)*RINNER/rcyl);
 lambda1=11./5./(1.+64./25.*alphav*alphav);
 
 //if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
@@ -75,7 +75,7 @@ lambda1=11./5./(1.+64./25.*alphav*alphav);
 // Keplerian adiabatic disk in vertical pressure equilibrium with the
 //   adiabatic corona, as given by Kluzniak & Kita (2000)
 
-pres=eps2*pow(coeff,5./2.);
+pres=(1./RINNER)*eps2*pow(coeff,5./2.);
    
     if (pres >= pc && rcyl > rd){
       pp[RHO] = pow(coeff,3./2.);      

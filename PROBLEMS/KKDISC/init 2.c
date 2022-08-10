@@ -38,11 +38,9 @@ else{
   alphav=ALPHA_DISC;
   rhoc=RHO_EPS * RHO_DISC_MAX;
   //notice that rhoc and coeff are multiplied with rho0, in KK00 rho0=1.
-  coeff=RHO_DISC_MAX*(2./5./eps2)*(RINNER/r-(1.-5./2.*eps2)*RINNER/rcyl);
-  lambda1=11./5./(1.+64./25.*alphav*alphav);
+  coeff=RHO_DISC_MAX*(2./5./eps2)*(RINNER/r-(1.-2.5*eps2)*RINNER/rcyl);
+  lambda1=(11./5.)/(1.+(64./25.)*alphav*alphav);
   pp[RHO] = pow(coeff,3./2.);
-  pres=(1./RINNER)*eps2*pow(coeff,5./2.);
-  pp[UU] = pres/(GAMMAM1);
 
   ldouble ucon[4];
 
@@ -53,21 +51,24 @@ else{
   ucon[0] = sqrt(-1.0/geomBL.gg[0][0]);	
 
 
+  pres=(1./RINNER)*eps2*pow(coeff,5./2.);
        
-  ucon[1] = -alphav/sin(th)*eps2*(10.-32./3.*lambda1*alphav*alphav       -lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl*pow(sin(th),2.0));
-//	ucon[1] = 0;       
-	ucon[3] = (sqrt(1.-5./2.*eps2)+2./3.*eps2*alphav*alphav *lambda1*(1.-6./(5.*eps2*tan(th)*tan(th))))/sqrt(rcyl)/r; 
+        ucon[1] =  -(alphav/sin(th))*eps2*(10.-(32./3.)*lambda1*alphav*alphav-lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl);//
+	//ucon[1] = 0;       
+	ucon[3] = (sqrt(1.-5.*eps2/2.)+(2./3.)*eps2*alphav*alphav*lambda1*(1.-6./(5.*eps2*tan(th)*tan(th))))/sqrt(rcyl)/r; //
 	//ucon[3] = sqrt(1.0/pow(r,3.0));      
-fill_utinucon(ucon,geomBL.gg, geomBL.GG);
-	//ucon[0] = sqrt(-1.0/(geomBL.gg[0][0] + geomBL.gg[3][3]*ucon[3]*ucon[3] + geomBL.gg[1][1]*ucon[1]*ucon[1]));
+	fill_utinucon(ucon,geomBL.gg, geomBL.GG);
+
   	//ucon[0] = sqrt((-1.0-geomBL.gg[3][3]*ucon[3]*ucon[3])/geomBL.gg[0][0]);   
 
 
+   pp[UU] = pres/(GAMMA-1);
 
 ucon[1]*= ucon[0];
 ucon[2]*= ucon[0];
 ucon[3]*= ucon[0];
 
+fill_utinucon(ucon,geomBL.gg, geomBL.GG);
  //ucon[0]=1./sqrt(-geomBL.GG[0][0])i
  conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG); 
 
@@ -109,7 +110,7 @@ mmb=-5./4.;//parameter for shape of B.
       pp[B2]=3.0*mub*cos(th)*sin(th)/(r*r*r*r);
       pp[B3]=0.;
     }
-}
+   }
 /* quadrupole 
   B0[0] = 3.0/2.0*g_inputParam[MU]*(3.0*cos(x2)*cos(x2)-1.0)/(x1*x1*x1*x1);
   B0[1] = 3.0*g_inputParam[MU]*cos(x2)*sin(x2)/(x1*x1*x1*x1);

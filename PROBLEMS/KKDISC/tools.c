@@ -7,7 +7,7 @@ int init_KKdisk(ldouble r, ldouble th, ldouble *rhoout,ldouble *uintout){
   ldouble rho0=RHO_DISC_MAX;//free param. multipl. factor to KK00=1 max disk density
   ldouble rhoc=RHO_EPS * RHO_DISC_MAX;
 
-  ldouble coeff=rho0*2./5./eps2*(1./r-(1.-5./2.*eps2)/rcyl);
+  ldouble coeff=RHO_DISC_MAX*2./5./eps2*(RINNER/r-(1.-5./2.*eps2)*RINNER/rcyl);
   ldouble lambda1=11./5./(1.+64./25.*alphav*alphav);
 
   ldouble rho = rhoc*pow(r,-3./2.);
@@ -15,7 +15,7 @@ int init_KKdisk(ldouble r, ldouble th, ldouble *rhoout,ldouble *uintout){
   ldouble uint = pres/(GAMMA-1);
   ldouble pc=pres;
 
-  pres=eps2*pow(coeff,5./2.);
+  pres=(1./RINNER)*eps2*pow(coeff,5./2.);
 
   if (pres >= pc && rcyl > rd){
       rho = pow(coeff,3./2.);     

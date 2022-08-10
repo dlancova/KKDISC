@@ -12,7 +12,7 @@ int init_dsandvels_KKHDthindisc(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE
   alphav=1.0;
   rhoc=0.01;
   
-   coeff=2./5./eps2*(1./r-(1.-5./2.*eps2)/R);
+   coeff=RHO_DISC_MAX*2./5./eps2*(RINNER/r-(1.-5./2.*eps2)*RINNER/rcyl);
    lambda=11./5./(1.+64./25.*alphav*alphav); 
 /* initial non-rotating adiabatic corona in hydrostatic equilibrium  */
  rho = rhoc*pow(r,-3./2.);
