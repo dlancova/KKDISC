@@ -4,7 +4,7 @@
 
 /**********************/
 //geometries
-ldouble rcyl, pres, eps, eps2, coeff, lambda, rhoc, pc, rd, alphav;
+ldouble rcyl, pres, eps, eps2, coeff, lambda1, rhoc, pc, rd, alphav;
 ldouble gdet_src,gdet_bc,Fx,Fy,Fz,ppback[NV];
 int iix,iiy,iiz,iv,iiya;  	  
 
@@ -21,14 +21,12 @@ ldouble th=geomBL.yy;
 
 eps2=HR_INIT*HR_INIT;
 rcyl=r*sin(th);
-rd=MKSR0;
+rd=RINNER;
 alphav=ALPHA_DISC;
 rhoc=RHO_EPS * RHO_DISC_MAX;
 
-coeff=2./5./eps2*(1./r-(1.-5./2.*eps2)/rcyl);
-lambda=11./5./(1.+64./25.*alphav*alphav);
-
-//radius
+coeff=RHO_DISC_MAX*2./5./eps2*(1./r-(1.-5./2.*eps2)/rcyl);
+lambda1=11./5./(1.+64./25.*alphav*alphav);
 
 //if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
 //ccm130422--keep the initial disk values at the rmax 
@@ -57,6 +55,7 @@ lambda=11./5./(1.+64./25.*alphav*alphav);
     ldouble deltar = rbound - rghost;
     ldouble scale1 =  rbound*rbound/rghost/rghost;
     ldouble scale2 = rbound/rghost;
+    ldouble ucon_disc[4];
 
     pp[RHO]*=scale1;
     pp[UU] *=scale1;
@@ -78,20 +77,27 @@ lambda=11./5./(1.+64./25.*alphav*alphav);
 
 pres=eps2*pow(coeff,5./2.);
    
-    if (pres >= pc && rcyl > rd)
-      {pp[RHO] = pow(coeff,3./2.);      
-       pp[VX] = -alphav/sin(th)*eps2*(10.-32./3.*lambda*alphav*alphav
-       -lambda*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl);
-       pp[VZ] = (sqrt(1.-5./2.*eps2)+2./3.*eps2*alphav*alphav
-       *lambda*(1.-6./(5.*eps2*tan(th)*tan(th))))/sqrt(rcyl); 
-      }
+    if (pres >= pc && rcyl > rd){
+      pp[RHO] = pow(coeff,3./2.);      
+      ucon_disc[1] = -alphav/sin(th)*eps2*(10.-32./3.*lambda1*alphav*alphav       -lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl*pow(sin(th),2.0));
+      ucon_disc[3] = 5.0e-3 * (sqrt(1.-5./2.*eps2)+2./3.*eps2*alphav*alphav *lambda1*(1.-6./(5.*eps2*tan(th)*tan(th))))/sqrt(rcyl)/r; 
+      ucon_disc[2] = 0.0;
+      fill_utinucon(ucon_disc,geomBL.gg, geomBL.GG);
+      ucon_disc[1]*= ucon_disc[0];
+      ucon_disc[2]*= ucon_disc[0];
+      ucon_disc[3]*= ucon_disc[0];
+      conv_vels(ucon_disc,ucon_disc,VEL4,VELPRIM,geomBL.gg,geomBL.GG); 
+      pp[VX] = ucon_disc[1];
+      pp[VY] = ucon_disc[2];
+      pp[VZ] = ucon_disc[3];
+      
+    }
     else
       {
        pres=pc;
       }  
 
- pp[UU]=GAMMA/GAMMAM1*pres/pp[RHO];
-
+pp[UU] = pres/(GAMMA-1);
 // Save conserved and primitives over domain + ghost (no corners)
 // ccm--140422--all at t=1., could be t=0. also, why 1. here works and 0. not?
 //  copyi_u(1.,u,upreexplicit); //conserved quantities before explicit update

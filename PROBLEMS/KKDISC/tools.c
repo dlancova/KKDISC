@@ -12,7 +12,7 @@ int init_KKdisk(ldouble r, ldouble th, ldouble *rhoout,ldouble *uintout){
 
   ldouble rho = rhoc*pow(r,-3./2.);
   ldouble pres= 2./5.*rhoc*pow(r,-5./2.);
-  ldouble uint = pres*rho/(GAMMA-1);
+  ldouble uint = pres/(GAMMA-1);
   ldouble pc=pres;
 
   pres=eps2*pow(coeff,5./2.);
@@ -25,7 +25,7 @@ int init_KKdisk(ldouble r, ldouble th, ldouble *rhoout,ldouble *uintout){
   }  
 
   *rhoout = rho;
-  *uintout = GAMMA/GAMMAM1*pres/rho;
+  *uintout = pres/GAMMAM1;
 
 }
 

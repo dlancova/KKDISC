@@ -41,9 +41,9 @@ else{
   coeff=RHO_DISC_MAX*2./5./eps2*(1./r-(1.-5./2.*eps2)/rcyl);
   lambda1=11./5./(1.+64./25.*alphav*alphav);
   pp[RHO] = pow(coeff,3./2.);
-  pres= 2./5.*rhoc*pow(r,-5./2.);
-  pp[UU] = pres*pp[RHO]/(GAMMA-1);
-  pc=pres;
+  pres=eps2*pow(coeff,5./2.);
+  pp[UU] = pres/(GAMMA-1);
+
   ldouble ucon[4];
 
   ucon[1] = 0;
@@ -53,7 +53,6 @@ else{
   ucon[0] = sqrt(-1.0/geomBL.gg[0][0]);	
 
 
-  pres=eps2*pow(coeff,5./2.);
        
   ucon[1] = -alphav/sin(th)*eps2*(10.-32./3.*lambda1*alphav*alphav       -lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl*pow(sin(th),2.0));
 //	ucon[1] = 0;       
@@ -64,13 +63,11 @@ fill_utinucon(ucon,geomBL.gg, geomBL.GG);
   	//ucon[0] = sqrt((-1.0-geomBL.gg[3][3]*ucon[3]*ucon[3])/geomBL.gg[0][0]);   
 
 
- pp[UU]=GAMMA/GAMMAM1*pres/pp[RHO];
 
 ucon[1]*= ucon[0];
 ucon[2]*= ucon[0];
 ucon[3]*= ucon[0];
 
-fill_utinucon(ucon,geomBL.gg, geomBL.GG);
  //ucon[0]=1./sqrt(-geomBL.GG[0][0])i
  conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG); 
 

@@ -153,9 +153,9 @@
     // Max density in the disc centre
     #define RHO_DISC_MAX 1.0
     // max atm. density = RHO_EPS * RHO_DISC_MAX (at horizon)
-    #define RHO_EPS 1.0e-2
+    #define RHO_EPS 1.0e-4
     #define EPSS 0.1//thin disk height ratio
-    #define ALPHA_DISC 1.0 //viscous alpha
+    #define ALPHA_DISC 0.6 //viscous alpha
     #define HR_INIT 0.1 //initial disc thickness 
 #endif //TDISK 1
 
