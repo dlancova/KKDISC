@@ -25,7 +25,7 @@ rd=RINNER;
 alphav=ALPHA_DISC;
 rhoc=RHO_EPS * RHO_DISC_MAX;
 
-coeff=RHO_DISC_MAX*2./5./eps2*(RINNER/r-(1.-5./2.*eps2)*RINNER/rcyl);
+coeff=RHO_DISC_MAX*(2./5./eps2)*(RINNER/r-(1.-5./2.*eps2)*RINNER/rcyl);
 lambda1=11./5./(1.+64./25.*alphav*alphav);
 
 //if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
@@ -80,7 +80,7 @@ pres=(1./RINNER)*eps2*pow(coeff,5./2.);
     if (pres >= pc && rcyl > rd){
       pp[RHO] = pow(coeff,3./2.);      
       ucon_disc[1] = -alphav/sin(th)*eps2*(10.-32./3.*lambda1*alphav*alphav       -lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl*pow(sin(th),2.0));
-      ucon_disc[3] = 5.0e-3 * (sqrt(1.-5./2.*eps2)+2./3.*eps2*alphav*alphav *lambda1*(1.-6./(5.*eps2*tan(th)*tan(th))))/sqrt(rcyl)/r; 
+      ucon_disc[3] = (sqrt(1.-5./2.*eps2)+2./3.*eps2*alphav*alphav *lambda1*(1.-6./(5.*eps2*tan(th)*tan(th))))/sqrt(rcyl)/r; 
       ucon_disc[2] = 0.0;
       fill_utinucon(ucon_disc,geomBL.gg, geomBL.GG);
       ucon_disc[1]*= ucon_disc[0];
