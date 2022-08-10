@@ -32,10 +32,10 @@ if (rho<0){
 }
 else{
   set_hdatmosphere(ppback,geom.xxvec,geom.gg,geom.GG,5);
-  eps2=EPSS*EPSS;
+  eps2=HR_INIT*HR_INIT;
   rcyl=r*sin(th);
   rd=RINNER;
-  alphav=1.0;
+  alphav=ALPHA_DISC;
   rhoc=RHO_EPS * RHO_DISC_MAX;
   //notice that rhoc and coeff are multiplied with rho0, in KK00 rho0=1.
   coeff=RHO_DISC_MAX*2./5./eps2*(1./r-(1.-5./2.*eps2)/rcyl);

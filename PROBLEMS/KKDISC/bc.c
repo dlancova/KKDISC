@@ -19,12 +19,11 @@ ldouble r=geomBL.xx;
 ldouble th=geomBL.yy;
 
 
-eps=0.1;
-eps2=eps*eps;
+eps2=HR_INIT*HR_INIT;
 rcyl=r*sin(th);
 rd=MKSR0;
-alphav=1.0;
-rhoc=0.01;
+alphav=ALPHA_DISC;
+rhoc=RHO_EPS * RHO_DISC_MAX;
 
 coeff=2./5./eps2*(1./r-(1.-5./2.*eps2)/rcyl);
 lambda=11./5./(1.+64./25.*alphav*alphav);
@@ -67,7 +66,7 @@ lambda=11./5./(1.+64./25.*alphav*alphav);
 // initial non-rotating adiabatic corona in hydrostatic equilibrium
  pp[RHO] = rhoc*pow(r,-3./2.);
  pres= 2./5.*rhoc*pow(r,-5./2.);
- pp[UU] = pres*pp[RHO]/(GAMMA-1);
+ pp[UU] = pres*pp[RHO]/(GAMMAM1);
  pc=pres;
  
 //  pp[VX] = 0.0;

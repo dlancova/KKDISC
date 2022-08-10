@@ -1,5 +1,4 @@
-//#define NONRELMHD
-//#define MHD
+
 /************************************/
 //general
 /************************************/
@@ -10,13 +9,11 @@
 /************************************/ 
 #define RESTART
 #define RESTARTGENERALINDICES
-//#define RESCALEDENSITY 2.
 #define RESTARTNUM -1
 
 /************************************/
 //magnetic choices
 /************************************/
-/**/
 #define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
@@ -44,16 +41,16 @@
 #define MINMOD_THETA 1.5
 
 /************************************/
-//YSO
+//blackhole
 /************************************/
 #define MASS 10.//MSUNCM
 #define BHSPIN 0.
 
 /************************************/
-//blackhole
+//physics 
 /************************************/
-//#define MASS 1.e1//6
-//#define BHSPIN 0.10
+#define GAMMA (5./3.)
+
 
 /************************************/
 //coordinates
@@ -66,18 +63,20 @@
 #define MKSMY2 0.025
 #define MKSMP0 1.5
 #define METRICAXISYMMETRIC
-#define RH 0.6//1.348
-#define RMIN 2.0 //1.85
+#define RMIN 1.85
 #define RMAX 50
-//1.e5
-/**/ //setup in MKS2 coords
-#ifdef myMKS2COORDS //modified Kerr-Shild
-#define MYCOORDS MKS2COORDS//6 for spherical
-#define MINX (log(RMIN-MKSR0))//(RMIN)
-#define MAXX (log(RMAX-MKSR0))//(RMAX)
-#define MINY (0.1)
-#define MAXY (1.-MINY)//M_PI-MINY)//(1.-MINY)//M_PI-MINY)
+
+/************************************/
+//setup for MKS2 coords
+/************************************/
+#ifdef myMKS2COORDS 
+#define MYCOORDS MKS2COORDS
+#define MINX (log(RMIN-MKSR0))
+#define MAXX (log(RMAX-MKSR0))
+#define MINY (0.1)  // 0.001 for bigger domin closer to polar axis 
+#define MAXY (1.-MINY)
 #endif
+
 #ifdef myMKS3COORDS //modified Kerr-Shild further from axis
 #define METRICNUMERIC
 #define MYCOORDS MKS2COORDS
@@ -91,54 +90,24 @@
 #define PHIWEDGE (M_PI/2.)
 #define MINZ (-PHIWEDGE/2.)
 #define MAXZ (PHIWEDGE/2.)
-/**/ //end of setup in MKS2 coords
 
-/* //setup in spherical coords
-//#define MKS2COORDS
-//#define mySPHCOORDS
-#define MYCOORDS 6
-//#define MYCOORDS MKS2COORDS 
-#define METRICAXISYMMETRIC
-
-//#define MINX 0.
-//#define MAXX 1.
-#define MINX (RMIN)
-#define MAXX (RMAX)
-
-//#define Y_OFFSET 0.009
-#define MINY (0.1)
-#define MAXY (M_PI-MINY)
-
-//#define MKSMY1 0.0025
-//#define MKSMY2 0.025
-//#define MKSMP0 1.2
-
-//#endif //End of whateverCOORDS
-#define PHIWEDGE (0.5*M_PI)
-#define MINZ (-PHIWEDGE/2.)
-#define MAXZ (PHIWEDGE/2.)
-*/ //end of setup in spherical coords
 /************************************/
 //resolution 
 /************************************/
-//total resolution
-//#define TNX 384 //16*17
-//#define TNY 384 //16*12
+
 #define TNX 124 //16*17
 #define TNY 124 //16*12
 #define TNZ 1//32//128 //16*8
 
-//number of tiles
+//number of tiles for MPI
 #define NTX 1//32//16//32//16//17
 #define NTY 1//16//16//32//8//12
-//#define NTX 8//16//32//16//17
-//#define NTY 8//16//32//8//12
 #define NTZ 1//2//8
 
 /************************************/
 //boundary conditions 
 /************************************/
-#define SPECIFIC_BC
+#define SPECIFIC_BC //in bc.c
 #define PERIODIC_ZBC
 //#define PERIODIC_XBC
 //#define PERIODIC_YBC
@@ -147,16 +116,20 @@
 //output
 /************************************/
 #define DTOUT1 1. //res - files
-//#define DTOUT2 1000.  //avg - files
-//#define DTOUT3 1. //box,var - files
-#define OUTCOORDS KERRCOORDS                                                                    
+#define DTOUT2 1000.  //avg - files
+
+#define OUTCOORDS BLCOORDS                                                                    
 #define OUTVEL VEL4
 #define ALLSTEPSOUTPUT 0
-//#define OUTPUTINZAMO
 #define NSTEPSTOP 1.e10
-#define NOUTSTOP 5000//5000
+#define NOUTSTOP 5000
 #define SILOOUTPUT 1
-#define OUTOUTPUT 0
+#define SIMOUTPUT 0
+#define RADOUTPUT 0 
+#define SCAOUTPUT 0
+#define AVGOUTPUT 0
+#define THOUTPUT 0
+#define THPROFRAD1US 30
 
 #if(TNZ==1)//if 2D
 #define SILO2D_XZPLANE
@@ -164,54 +137,46 @@
 #define FULLPHI
 #endif
 
-// Inner edge of the disc
-#define RINNER 6.
-// Max density in the disc centre
-#define RHO_DISC_MAX 1.0
-// max atm. density = RHO_EPS * RHO_DISC_MAX (at horizon)
-#define RHO_EPS 1.0e-2
-
-/************************************/
-//physics 
-/************************************/
-#define GAMMA (5./3.)
-
 /************************************/
 //initial disk 
 /************************************/
 /**/ //This for later choices
-#define TDISK 2
+#define TDISK 1
+
+/************************************/
+//disc choices
+/************************************/
 
 #if(TDISK==1) //Kluzniak&Kita(2000) thin disk in HD
-#endif
+    // Inner edge of the disc
+    #define RINNER r_ISCO_BL(BHSPIN)
+    // Max density in the disc centre
+    #define RHO_DISC_MAX 1.0
+    // max atm. density = RHO_EPS * RHO_DISC_MAX (at horizon)
+    #define RHO_EPS 1.0e-2
+    #define EPSS 0.1//thin disk height ratio
+    #define ALPHA_DISC 1.0 //viscous alpha
+    #define HR_INIT 0.1 //initial disc thickness 
+#endif //TDISK 1
+
 
 #if(TDISK==2) //Kluzniak&Kita(2000) thin disk with hourglass Bfield
-//in TDISK
-#define EPSS 0.1//thin disk height ratio
 
-#ifdef RADIATION
-//#define RGAMMA 4./3.
-//#else
-//#define RGAMMA 5./3.
-#endif
+    #define EPSS 0.1//thin disk height ratio
 
 #endif//ending TDISK
 
 #if(TDISK==3) //Kluzniak&Kita(2000) thin disk in RMHD
+    // TBD
 #endif
-/**/
 //#define BETANORMFULL
-
-#define RHO0 1
 
 /************************************/
 //rmhd floors
 /************************************/
-/**/
 #define RHOFLOOR 1.e-50
 //#define UURHORATIOMIN 1.e-8//1K: uu/rho = 7.259162e+12
 //#define UURHORATIOMAX 1.e20
-//NSDISK
 #define CORRECT_POLARAXIS
 #define NCCORRECTPOLAR 2
 #define UURHORATIOMIN 1.e-10
