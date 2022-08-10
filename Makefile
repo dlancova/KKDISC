@@ -1,8 +1,17 @@
 
+ifneq ($(SERIAL),1)
+CC=mpiicc
+CFLAGS= -w  -O2 -DMPI -DNOSILO -xCORE-AVX2
+else
+CC=gcc
+CFLAGS= -fopenmp  -O2 -DNOSILO
 CC=gcc
 #CC=pgcc
 CFLAGS=-O3 -fopenmp -w -lrt -L/home/maxadmin/silo-4.10.2/lib -I/home/maxadmin/silo-4.10.2/include
 #CFLAGS=CFLAGS=-O3 -mp -w -lrt -L/home/maxadmin/silo-4.10.2/lib -I/home/maxadmin/silo-4.10.2/include
+
+endif
+
 LIBS=-lm -lgsl -lgslcblas -lsilo
 RM=/bin/rm
 
