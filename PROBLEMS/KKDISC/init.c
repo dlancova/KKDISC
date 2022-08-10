@@ -55,11 +55,11 @@ else{
 
   pres=eps2*pow(coeff,5./2.);
        
-  ucon[1] = -alphav/sin(th)*eps2*(10.-32./3.*lambda1*alphav*alphav       -lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl);
+  ucon[1] = -alphav/sin(th)*eps2*(10.-32./3.*lambda1*alphav*alphav       -lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl*pow(sin(th),2.0));
 //	ucon[1] = 0;       
-	ucon[3] = (sqrt(1.-5./2.*eps2)+2./3.*eps2*alphav*alphav *lambda1*(1.-6./(5.*eps2*tan(th)*tan(th))))/sqrt(rcyl); 
+	ucon[3] = 5.0e-3 * (sqrt(1.-5./2.*eps2)+2./3.*eps2*alphav*alphav *lambda1*(1.-6./(5.*eps2*tan(th)*tan(th))))/sqrt(rcyl)/r; 
 	//ucon[3] = sqrt(1.0/pow(r,3.0));      
-	//fill_utinucon(ucon,geomBL.gg, geomBL.GG);
+fill_utinucon(ucon,geomBL.gg, geomBL.GG);
 	//ucon[0] = sqrt(-1.0/(geomBL.gg[0][0] + geomBL.gg[3][3]*ucon[3]*ucon[3] + geomBL.gg[1][1]*ucon[1]*ucon[1]));
   	//ucon[0] = sqrt((-1.0-geomBL.gg[3][3]*ucon[3]*ucon[3])/geomBL.gg[0][0]);   
 
