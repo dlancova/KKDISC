@@ -1,53 +1,31 @@
 
-int init_dsandvels_KKdisk(FTYPE r, FTYPE th, FTYPE a, FTYPE *rhoout, FTYPE *uuout, FTYPE *ell)
-{
-  ldouble rho,pre,phi,phi0,uint,phit0,phit,L,L0,cs0,uint0,rho0,n,R;
-  ldouble eps, eps2, coeff, lambda, rhoc, pca, rd, alphav;
-  
-//  if(r<KT_RMIN) {*rhoout=-1.;return 0;}
+int init_KKdisk(ldouble r, ldouble th, ldouble *rhoout,ldouble *uintout){
+  ldouble eps2=EPSS*EPSS;
+  ldouble rcyl=r*sin(th);
+  ldouble rd=RINNER;
+  ldouble alphav=1.0;
+  ldouble rho0=RHO0;//free param. multipl. factor to KK00=1 max disk density
+  ldouble rhoc=0.01*rho0;
 
-  R=r*sin(th); //cylindrical radius 
-  eps=0.1;
-  eps2=eps*eps;
-  rd=1.7;
-  alphav=1.0;
-  rhoc=0.01;
-  
-  coeff=2./5./eps2*(1./r-(1.-5./2.*eps2)/R);
-  lambda=11./5./(1.+64./25.*alphav*alphav); 
+  ldouble coeff=rho0*2./5./eps2*(1./r-(1.-5./2.*eps2)/rcyl);
+  ldouble lambda1=11./5./(1.+64./25.*alphav*alphav);
 
-//ccm--271021
-/* initial non-rotating adiabatic corona in hydrostatic equilibrium  */
- rho = rhoc*pow(r,-3./2.);
- pre = 2./5.*rhoc*pow(r,-5./2.);
- 
- pca=pre;
+  ldouble rho = rhoc*pow(r,-3./2.);
+  ldouble pres= 2./5.*rhoc*pow(r,-5./2.);
+  ldouble uint = pres*rho/(GAMMA-1);
+  ldouble pc=pres;
 
-/* Keplerian adiabatic disk in vertical pressure equilibrium with the
-   adiabatic corona, as given by Kluzniak & Kita (2000) */
+  pres=eps2*pow(coeff,5./2.);
 
-  pre=eps2*pow(coeff,5./2.);
+  if (pres >= pc && rcyl > rd){
+      rho = pow(coeff,3./2.);     
+  }
+  else{
+    rho = -1.0;
+  }  
 
-    if (pre >= pca && R > rd)
-      {rho = pow(coeff,3./2.);
-      }
-    else
-      {
-       pre=2./5.*rhoc*pow(r,-5./2.);
-      }  
-//ccm
-  uint = pre / GAMMAM1;
-
-/*
-  #ifdef KT_RHO_FLOOR //This keeps the same Bernoulli number but reduces mass in disk
-  if (rho < KT_RHO_FLOOR) {*rhoout=-1.;return 0;}
-  #endif
-*/
   *rhoout = rho;
-  *uuout = uint;
-  *ell = L;
-
-  return 0;
+  *uintout = GAMMA/GAMMAM1*pres/rho;
 
 }
 

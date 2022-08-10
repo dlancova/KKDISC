@@ -704,7 +704,36 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
 
       return 0;
     }
- 
+
+  if(atmtype==5) //adiabatic for KK disk, rho = rhoc*r^(-3/2), p = 2/5 rhoc r^(-5/2) uint = p*rho /(GAMMA-1)
+    {
+      //normal observer
+      ldouble ucon[4];
+      ldouble xx2[4];
+      ldouble pres;
+      calc_normalobs_relvel(GG,ucon);
+      if (VELR != VELPRIM)
+      {
+        conv_vels(ucon,ucon,VELR,VELPRIM,gg,GG);
+      }
+      pp[2]=ucon[1];
+      pp[3]=ucon[2];
+      pp[4]=ucon[3];
+      
+      coco_N(xx,xx2,MYCOORDS,BLCOORDS);
+      ldouble r=xx2[1];
+
+      ldouble rin=rhorizonBL;
+      pp[RHO] = RHO_EPS * RHO_DISC_MAX*pow(r/rin,-1.5);
+      pres= 2./5.*RHO_EPS * RHO_DISC_MAX*pow(r/rin,-5./2.);
+      pp[UU] =pres * pp[RHO]/GAMMAM1;
+
+      #ifdef MAGNFIELD
+      pp[B1]=pp[B2]=pp[B3]=0.;
+      #endif
+
+      return 0;
+    } 
     my_err("atmtype value not handled in set_atmosphere()\n");
   return 0.;
 }

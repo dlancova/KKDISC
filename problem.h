@@ -155,11 +155,9 @@
 
 #define PR_DEFINE "PROBLEMS/KKDISC/define.h"
 #define PR_BC "PROBLEMS/KKDISC/bc.c"
-//#define PR_BC_SPECIAL "PROBLEMS/PARTIALTDE/bc_special.c"
-//#define PR_BC_SPECIAL_LOOP "PROBLEMS/PARTIALTDE/loop_alloc_special.c"
 #define PR_INIT "PROBLEMS/KKDISC/init.c"
-//#define PR_KAPPA "PROBLEMS/KEPINF/kappa.c"
-//#define PR_KAPPAES "PROBLEMS/PARTIALTDE/kappaes.c"
+#define PR_TOOLS "PROBLEMS/KKDISC/tools.c"
+
 #endif
 
 #if(PROBLEM==142)

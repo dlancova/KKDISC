@@ -164,7 +164,12 @@
 #define FULLPHI
 #endif
 
+// Inner edge of the disc
 #define RINNER 6.
+// Max density in the disc centre
+#define RHO_DISC_MAX 1.0
+// max atm. density = RHO_EPS * RHO_DISC_MAX (at horizon)
+#define RHO_EPS 1.0e-2
 
 /************************************/
 //physics 

@@ -1,77 +1,68 @@
+int init_KKdisk(ldouble r, ldouble th, ldouble *rho,ldouble *uint);
+
+
 //MC240322--setup of KK00 disk, first HD version, then slowly moving towards
 //a complete MHD version. Idea is to set it for NS and then shift to SMBH case.
 ldouble rho,mx,my,mz,m,E,uint,pgas,Fx,Fy,Fz,pLTE,ell;  
 ldouble uu[NV], pp[NV],ppback[NV],T,uintorg;
 ldouble Vphi,Vr;
 ldouble D,W,uT,uphi,uPhi;
-ldouble rcyl, pres, eps2, coeff, lambda1, rho0, rhoc, pc, rd, alphav;
+ldouble rcyl, pres, eps2, coeff, lambda1, rhoc, pc, rd, alphav;
 ldouble mub, rminb, mmb;
 int loops, openn;//to be given by hand later, for choice of loops model
 //geometries
+
+//geometry in MYCOORDS
 struct geometry geom;
 fill_geometry(ix,iy,iz,&geom);
 
+//geometry in BLCOORDS
 struct geometry geomBL;
 fill_geometry_arb(ix,iy,iz,&geomBL,KERRCOORDS);
 
+//r and theta in BL
 ldouble r=geomBL.xx;
 ldouble th=geomBL.yy;
 
-//ldouble r=geom.xx;
-//ldouble th=geom.yy;
+init_KKdisk(r, th, &rho, &uint);
 
-//init_dsandvels_KKdisk(r, th, BHSPIN, &rho, &uint, &ell); 
-uintorg=uint;
-//read the values from define.h
-eps2=EPSS*EPSS;
-rcyl=r*sin(th);
-rd=RINNER;
-alphav=1.0;
-rho0=RHO0;//free param. multipl. factor to KK00=1 max disk density
-rhoc=0.01*rho0;
-//notice that rhoc and coeff are multiplied with rho0, in KK00 rho0=1.
-coeff=rho0*2./5./eps2*(1./r-(1.-5./2.*eps2)/rcyl);
-lambda1=11./5./(1.+64./25.*alphav*alphav);
+if (rho<0){
+  // for now go with the 0 atm. 
+  set_hdatmosphere(pp,geom.xxvec, geom.gg, geom.GG,5);
+}
+else{
+  set_hdatmosphere(ppback,geom.xxvec,geom.gg,geom.GG,5);
+  eps2=EPSS*EPSS;
+  rcyl=r*sin(th);
+  rd=RINNER;
+  alphav=1.0;
+  rhoc=RHO_EPS * RHO_DISC_MAX;
+  //notice that rhoc and coeff are multiplied with rho0, in KK00 rho0=1.
+  coeff=RHO_DISC_MAX*2./5./eps2*(1./r-(1.-5./2.*eps2)/rcyl);
+  lambda1=11./5./(1.+64./25.*alphav*alphav);
+  pp[RHO] = pow(coeff,3./2.);
+  pres= 2./5.*rhoc*pow(r,-5./2.);
+  pp[UU] = pres*pp[RHO]/(GAMMA-1);
+  pc=pres;
+  ldouble ucon[4];
 
-// initial non-rotating adiabatic corona in hydrostatic equilibrium
-// notice that rho0 is is implicitly entering here 
- pp[RHO] = rhoc*pow(r,-3./2.);
- pres= 2./5.*rhoc*pow(r,-5./2.);
- pp[UU] = pres*pp[RHO]/(GAMMA-1);
- pc=pres;
- ldouble ucon[4];
+  ucon[1] = 0;
+  ucon[2] = 0;
+  ucon[3] = 0;
 
- ucon[1] = 0;
- ucon[2] = 0;
- ucon[3] = 0;
+  ucon[0] = sqrt(-1.0/geomBL.gg[0][0]);	
 
- ucon[0] = sqrt(-1.0/geomBL.gg[0][0]);	
 
- 
-//  pp[VX] = 0.0;
-//  pp[VY] = 0.0;  
-//  pp[VZ] = 0.0;
-  
-// Keplerian adiabatic disk in vertical pressure equilibrium with the
-//   adiabatic corona, as given by Kluzniak & Kita (2000)
-
-pres=eps2*pow(coeff,5./2.);
-   
-    if (pres >= pc && rcyl > rd)
-      {pp[RHO] = pow(coeff,3./2.);      
-       ucon[1] = -alphav/sin(th)*eps2*(10.-32./3.*lambda1*alphav*alphav       -lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl);
+  pres=eps2*pow(coeff,5./2.);
+       
+  ucon[1] = -alphav/sin(th)*eps2*(10.-32./3.*lambda1*alphav*alphav       -lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl);
 //	ucon[1] = 0;       
 	ucon[3] = (sqrt(1.-5./2.*eps2)+2./3.*eps2*alphav*alphav *lambda1*(1.-6./(5.*eps2*tan(th)*tan(th))))/sqrt(rcyl); 
 	//ucon[3] = sqrt(1.0/pow(r,3.0));      
 	//fill_utinucon(ucon,geomBL.gg, geomBL.GG);
 	//ucon[0] = sqrt(-1.0/(geomBL.gg[0][0] + geomBL.gg[3][3]*ucon[3]*ucon[3] + geomBL.gg[1][1]*ucon[1]*ucon[1]));
   	//ucon[0] = sqrt((-1.0-geomBL.gg[3][3]*ucon[3]*ucon[3])/geomBL.gg[0][0]);   
-printf("%lf, %lf %lf, %lf \n",ucon[0],ucon[1], ucon[2],  ucon[3]); 
-}
-    else
-      {
-       pres=pc;
-      }  
+
 
  pp[UU]=GAMMA/GAMMAM1*pres/pp[RHO];
 
@@ -451,7 +442,7 @@ pp[UU]*=1.+PERTMAGN*sin(10.*2.*M_PI*(MAXZ-geomBL.zz)/(MAXZ-MINZ));
 #endif //end of MAGNFIELD
 
   trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
-
+}
 
 //entropy
 pp[5]=calc_Sfromu(pp[0],pp[1],ix,iy,iz);
@@ -469,5 +460,7 @@ for(iv=0;iv<NV;iv++)
   }
 
 //entropy
-update_entropy(ix,iy,iz,0);
+update_entropy_cell(ix,iy,iz,0);
 set_cflag(0,ix,iy,iz,0);
+
+
