@@ -82,32 +82,31 @@ fill_utinucon(ucon,geomBL.gg, geomBL.GG);
 
   trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
 
-
   #ifdef MAGNFIELD
     ldouble Acov[4];
     Acov[0]=Acov[1]=Acov[2]=0.;
 
     Acov[3]=my_max(pow(pp[RHO]*geomBL.xx/4.e-22,2.)-0.02,0.)*sqrt(1.e-23);
-          #ifdef QUADLOOPS
-                  Acov[3]*=sin((M_PI/2.-geomBL.yy)/0.1);
-          #endif
+	  #ifdef QUADLOOPS
+		  Acov[3]*=sin((M_PI/2.-geomBL.yy)/0.1);
+	  #endif
 
-          #ifdef MULTIPLELOOPS
-                  Acov[3]*=sin(geomBL.xx/3.);
-          #endif
-
-
+	  #ifdef MULTIPLELOOPS
+		  Acov[3]*=sin(geomBL.xx/3.);
+	  #endif
+    
+     
     //Acov[3]=my_max(pow(pp[RHO]*geomBL.xx*geomBL.xx/4.e-20,2.)-0.02,0.)*sqrt(1.e-23)*pow(sin(fabs(geomBL.yy)),4.);
-
-    printf("%lf\n",Acov[3]);
-
+    
+    //printf("%lf\n",Acov[3]);
+     
 
     pp[B1]=Acov[1];
     pp[B2]=Acov[2];
     pp[B3]=Acov[3];
 
     #endif
-
+ 
 }
 
 //entropy
