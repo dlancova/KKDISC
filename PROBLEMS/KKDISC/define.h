@@ -18,7 +18,7 @@
 #define GDETIN 1
 #define VECPOTGIVEN
 
-#define MULTIPLELOOPS
+//#define MULTIPLELOOPS
 #define HLOOPS 0.5
 #define MAXBETA 1e-3 //target pmag/pgas int the midplane
 

@@ -42,7 +42,7 @@ for(iz=0;iz<NZ;iz++)
 		ptot+=prad;
 		
 #endif
-printf(" magn press %e\n",pmag);
+//printf(" magn press %e\n",pmag);
 #ifdef BETANORMFULL
 		//normalizing wrt everywhere
 #pragma omp critical
