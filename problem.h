@@ -156,7 +156,9 @@
 #define PR_DEFINE "PROBLEMS/KKDISC/define.h"
 #define PR_BC "PROBLEMS/KKDISC/bc.c"
 #define PR_INIT "PROBLEMS/KKDISC/init.c"
+#define PR_POSTINIT "PROBLEMS/KKDISC/postinit.c"
 #define PR_TOOLS "PROBLEMS/KKDISC/tools.c"
+
 
 #endif
 

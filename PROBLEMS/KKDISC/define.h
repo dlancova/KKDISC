@@ -17,7 +17,11 @@
 #define MAGNFIELD
 #define GDETIN 1
 #define VECPOTGIVEN
-//from NSDISK
+
+#define MULTIPLELOOPS
+#define HLOOPS 0.5
+#define MAXBETA 1e-3 //target pmag/pgas int the midplane
+
 /*
 #define MIMICDYNAMO
 #define CALCHRONTHEGO
@@ -124,7 +128,7 @@
 #define NSTEPSTOP 1.e10
 #define NOUTSTOP 5000
 #define SILOOUTPUT 1
-#define SIMOUTPUT 0
+#define SIMOUTPUT 1
 #define RADOUTPUT 0 
 #define SCAOUTPUT 0
 #define AVGOUTPUT 0
@@ -155,7 +159,7 @@
     // max atm. density = RHO_EPS * RHO_DISC_MAX (at horizon)
     #define RHO_EPS 1.0e-4
     #define EPSS 0.1//thin disk height ratio
-    #define ALPHA_DISC 0.6 //viscous alpha
+    #define ALPHA_DISC 0.5 //viscous alpha
     #define HR_INIT 0.1 //initial disc thickness 
 #endif //TDISK 1
 
