@@ -25,7 +25,7 @@ rd=RINNER;
 alphav=ALPHA_DISC;
 rhoc=RHO_EPS * RHO_DISC_MAX;
 
-coeff=RHO_DISC_MAX*(2./5./eps2)*(RINNER/r-(1.-5./2.*eps2)*RINNER/rcyl);
+coeff=(GAMMAM1/GAMMA/eps2)*(RINNER/r-(1.-GAMMA*eps2/GAMMAM1)*RINNER/rcyl);
 lambda1=11./5./(1.+64./25.*alphav*alphav);
 
 //if(BCtype==XBCHI) //outflow in magn, atm in rad., atm. in HD
@@ -41,7 +41,7 @@ lambda1=11./5./(1.+64./25.*alphav*alphav);
     for(iv=0;iv<NV;iv++)
       {
 	pp[iv]=get_u(p,iv,iix,iiy,iiz);
-	pp[iv]=get_u(p,iv,iix,iiy,iiz);
+	//pp[iv]=get_u(p,iv,iix,iiy,iiz);
       }
     
     //!! begin rescale
@@ -59,13 +59,26 @@ lambda1=11./5./(1.+64./25.*alphav*alphav);
 
     pp[RHO]*=scale1;
     pp[UU] *=scale1;
+    #ifdef MAGNFIELD
+      pp[B1] *=scale1;
+      pp[B2] *=scale2;
+      pp[B3] *=scale2;
+    #endif
+    pp[VY] *=scale1;
+    pp[VZ] *=scale1;
+        #ifdef RADIATION
+    pp[EE0] *=scale1;
+    //pp[FX0] *=1.;
+    pp[FY0] *=scale1;
+    pp[FZ0] *=scale1;
+    #endif
 
 //ccm220422--here starts the part Miki added to Debora's setup:    
 
 // initial non-rotating adiabatic corona in hydrostatic equilibrium
- pp[RHO] = rhoc*pow(r,-3./2.);
- pres= 2./5.*rhoc*pow(r,-5./2.);
- pp[UU] = pres*pp[RHO]/(GAMMAM1);
+ pp[RHO] = rhoc*pow(r,-1./GAMMAM1);
+ pres= (GAMMAM1/GAMMA)*rhoc*pow(r,-GAMMA/GAMMAM1)/RINNER;
+ pp[UU] = pres/(GAMMAM1);
  pc=pres;
  
 //  pp[VX] = 0.0;
@@ -75,10 +88,10 @@ lambda1=11./5./(1.+64./25.*alphav*alphav);
 // Keplerian adiabatic disk in vertical pressure equilibrium with the
 //   adiabatic corona, as given by Kluzniak & Kita (2000)
 
-pres=(1./RINNER)*eps2*pow(coeff,5./2.);
+pres=(1./RINNER)*eps2*pow(coeff,GAMMA/GAMMAM1);
    
     if (pres >= pc && rcyl > rd){
-      pp[RHO] = pow(coeff,3./2.);      
+      pp[RHO] = RHO_DISC_MAX*pow(coeff,1./GAMMAM1);   
       ucon_disc[1] = -alphav/sin(th)*eps2*(10.-32./3.*lambda1*alphav*alphav       -lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl*pow(sin(th),2.0));
       ucon_disc[3] = (sqrt(1.-5./2.*eps2)+2./3.*eps2*alphav*alphav *lambda1*(1.-6./(5.*eps2*tan(th)*tan(th))))/sqrt(rcyl)/r; 
       ucon_disc[2] = 0.0;
@@ -97,7 +110,7 @@ pres=(1./RINNER)*eps2*pow(coeff,5./2.);
        pres=pc;
       }  
 
-pp[UU] = pres/(GAMMA-1);
+pp[UU] = pres/(GAMMAM1);
 // Save conserved and primitives over domain + ghost (no corners)
 // ccm--140422--all at t=1., could be t=0. also, why 1. here works and 0. not?
 //  copyi_u(1.,u,upreexplicit); //conserved quantities before explicit update

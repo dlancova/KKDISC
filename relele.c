@@ -724,9 +724,9 @@ set_hdatmosphere(ldouble *pp,ldouble *xx,ldouble gg[][5],ldouble GG[][5],int atm
       ldouble r=xx2[1];
 
       ldouble rin=rhorizonBL;
-      pp[RHO] = RHO_EPS * RHO_DISC_MAX*pow(r/rin,-1.5);
-      pres= 2./5.*RHO_EPS * RHO_DISC_MAX*pow(r/rin,-5./2.);
-      pp[UU] =pres * pp[RHO]/GAMMAM1;
+      pp[RHO] = RHO_EPS * RHO_DISC_MAX*pow(r/rin,-1./GAMMAM1);
+      pres=  (GAMMAM1/GAMMA)*RHO_EPS * RHO_DISC_MAX*pow(r/rin,-GAMMA/GAMMAM1)/RINNER;
+      pp[UU] =pres/GAMMAM1;
 
       #ifdef MAGNFIELD
       pp[B1]=pp[B2]=pp[B3]=0.;

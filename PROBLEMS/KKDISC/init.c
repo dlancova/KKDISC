@@ -7,7 +7,7 @@ ldouble rho,mx,my,mz,m,E,uint,pgas,Fx,Fy,Fz,pLTE,ell;
 ldouble uu[NV], pp[NV],ppback[NV],T,uintorg;
 ldouble Vphi,Vr;
 ldouble D,W,uT,uphi,uPhi;
-ldouble rcyl, pres, eps2, coeff, lambda1, rhoc, pc, rd, alphav;
+ldouble rcyl, pres, eps2, coeff, lambda1, rhoc, rho0, pc, rd, alphav;
 ldouble mub, rminb, mmb;
 int loops, openn;//to be given by hand later, for choice of loops model
 //geometries
@@ -36,11 +36,13 @@ else{
   rcyl=r*sin(th);
   rd=RINNER;
   alphav=ALPHA_DISC;
-  rhoc=RHO_EPS * RHO_DISC_MAX;
+  rho0= RHO_DISC_MAX;
+  rhoc = RHO_EPS * rho0;
   //notice that rhoc and coeff are multiplied with rho0, in KK00 rho0=1.
-  coeff=RHO_DISC_MAX*(2./5./eps2)*(RINNER/r-(1.-2.5*eps2)*RINNER/rcyl);
+  
+  coeff= (GAMMAM1/GAMMA/eps2)*(RINNER/r-(1.-GAMMA*eps2/GAMMAM1)*RINNER/rcyl);
   lambda1=(11./5.)/(1.+(64./25.)*alphav*alphav);
-  pp[RHO] = pow(coeff,3./2.);
+  pp[RHO] = rho0*pow(coeff,1./GAMMAM1);
 
   ldouble ucon[4];
 
@@ -50,8 +52,7 @@ else{
 
   ucon[0] = sqrt(-1.0/geomBL.gg[0][0]);	
 
-
-  pres=(1./RINNER)*eps2*pow(coeff,5./2.);
+  pres=(1./RINNER)*eps2*pow(coeff,GAMMA/GAMMAM1);
        
         ucon[1] =  -(alphav/sin(th))*eps2*(10.-(32./3.)*lambda1*alphav*alphav-lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl);//
 	//ucon[1] = 0;       
@@ -62,7 +63,7 @@ else{
   	//ucon[0] = sqrt((-1.0-geomBL.gg[3][3]*ucon[3]*ucon[3])/geomBL.gg[0][0]);   
 
 
-   pp[UU] = pres/(GAMMA-1);
+   pp[UU] = pres/GAMMAM1;
 
 ucon[1]*= ucon[0];
 ucon[2]*= ucon[0];
