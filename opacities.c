@@ -221,7 +221,7 @@ ldouble calc_opacities_from_state(ldouble *pp, void *sss, void *ggg, void *op)
   ldouble nethcgs = state->ne * numdensgu2cgs;
   ldouble Bmagcgs = 0.0;
 
-  if(nethcgs<0) printf("negative neth %e\n",nethcgs);
+  if(nethcgs<0) printf("negative neth %e %lf\n",nethcgs,rho);
 
   ldouble zeta = Trad/Te;
   ldouble zeta_inv = 1. / zeta, zeta_inv_3 = zeta_inv * zeta_inv * zeta_inv;

@@ -76,8 +76,8 @@ lambda1=11./5./(1.+64./25.*alphav*alphav);
 //ccm220422--here starts the part Miki added to Debora's setup:    
 
 // initial non-rotating adiabatic corona in hydrostatic equilibrium
- pp[RHO] = rhoc*pow(r,-1./GAMMAM1);
- pres= (GAMMAM1/GAMMA)*rhoc*pow(r,-GAMMA/GAMMAM1)/RINNER;
+ pp[RHO] = rhoc*pow(r/RINNER,-1./GAMMAM1);
+ pres= (GAMMAM1/GAMMA)*rhoc*pow(r/RINNER,-GAMMA/GAMMAM1)/RINNER;
  pp[UU] = pres/(GAMMAM1);
  pc=pres;
  
@@ -88,7 +88,7 @@ lambda1=11./5./(1.+64./25.*alphav*alphav);
 // Keplerian adiabatic disk in vertical pressure equilibrium with the
 //   adiabatic corona, as given by Kluzniak & Kita (2000)
 
-pres=(1./RINNER)*eps2*pow(coeff,GAMMA/GAMMAM1);
+pres=(1./RINNER)*eps2*RHO_DISC_MAX*pow(coeff,GAMMA/GAMMAM1);
    
     if (pres >= pc && rcyl > rd){
       pp[RHO] = RHO_DISC_MAX*pow(coeff,1./GAMMAM1);   

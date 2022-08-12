@@ -1,3 +1,6 @@
+#define MU_GAS 1.
+#define MU_I 2.
+#define MU_E 2.
 
 /************************************/
 //general
@@ -36,6 +39,43 @@
 #define MAXBETA .01 //target pmag/pgas int the midplane
 */
 /**/
+
+/************************************/
+// Radiation (DEBORA - SETTINGS FROM PUFFY)
+/************************************/
+#define RADIATION
+#define ATMTRADINIT 1.e-2
+#define ERADATMMIN  calc_LTE_EfromT(ATMTRADINIT) //((calc_LTE_EfromT(3.e6)/10)/1.e19)
+
+#define U2PCONV 1.e-10  
+#define RADIMPLICITDAMPINGFACTOR 3.
+#define RADIMPLICITMAXENCHANGEDOWN 10.
+#define RADIMPLICIMAXENCHANGEUP 10.
+#define MAXRADIMPDAMPING 1.e-3
+#define RADIMPCONV 1.e-10
+#define RADIMPEPS 1.e-6
+#define RADIMPMAXITER 40
+#define RADIMPCONVREL 1.e-8
+#define RADIMPCONVRELERR 1.e-4
+#define RADIMPCONVRELENTR 1.e-4
+#define RADIMPCONVRELENTRERR 1.e-2
+#define OPDAMPINIMPLICIT 0 
+#define MAXRADIMPDAMPING 1.e-3
+
+//#define BREMSSTRAHLUNG
+//#define SYNCHROTRON
+//Should be used, the bridge function is adding a NR component to synchotron opacity
+//#define NO_SYNCHROTRON_BRIDGE_FUNCTIONS
+//#define KLEINNISHINA
+
+//DEBORA - for testing
+#define SKIPFANCYOPACITIES
+
+//#define EVOLVEPHOTONNUMBER
+//we need this for evolvephotonnumber
+//#define SCALE_JACOBIAN
+
+
 /************************************/
 //reconstruction / Courant
 /************************************/
@@ -156,7 +196,7 @@
     // Inner edge of the disc
     #define RINNER r_ISCO_BL(BHSPIN)
     // Max density in the disc centre
-    #define RHO_DISC_MAX 1.0
+    #define RHO_DISC_MAX 1.0e-22
     // max atm. density = RHO_EPS * RHO_DISC_MAX (at horizon)
     #define RHO_EPS 1.0e-4
     #define EPSS 0.1//thin disk height ratio

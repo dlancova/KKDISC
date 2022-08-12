@@ -29,9 +29,15 @@ init_KKdisk(r, th, &rho, &uint);
 if (rho<0){
   // for now go with the 0 atm. 
   set_hdatmosphere(pp,geom.xxvec, geom.gg, geom.GG,5);
+  #ifdef RADIATION
+    set_radatmosphere(pp,geom.xxvec,geom.gg,geom.GG,0);
+  #endif 
 }
 else{
   set_hdatmosphere(ppback,geom.xxvec,geom.gg,geom.GG,5);
+  #ifdef RADIATION
+    set_radatmosphere(ppback,geom.xxvec,geom.gg,geom.GG,0);
+  #endif
   eps2=HR_INIT*HR_INIT;
   rcyl=r*sin(th);
   rd=RINNER;
@@ -52,34 +58,56 @@ else{
 
   ucon[0] = sqrt(-1.0/geomBL.gg[0][0]);	
 
-  pres=(1./RINNER)*eps2*pow(coeff,GAMMA/GAMMAM1);
+  pres=(1./RINNER)*eps2*rho0*pow(coeff,GAMMA/GAMMAM1);
        
-        ucon[1] =  -(alphav/sin(th))*eps2*(10.-(32./3.)*lambda1*alphav*alphav-lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl);//
+  ucon[1] =  -(alphav/sin(th))*eps2*(10.-(32./3.)*lambda1*alphav*alphav-lambda1*(5.-1./(eps2*tan(th)*tan(th))))/sqrt(rcyl);//
 	//ucon[1] = 0;       
-	ucon[3] = (sqrt(1.-5.*eps2/2.)+(2./3.)*eps2*alphav*alphav*lambda1*(1.-6./(5.*eps2*tan(th)*tan(th))))/sqrt(rcyl)/r; //
+	ucon[3] = ((sqrt(1.-5.*eps2/2.)+(2./3.)*eps2*alphav*alphav*lambda1*(1.-6./(5.*eps2*tan(th)*tan(th))))/sqrt(rcyl))/r; //
 	//ucon[3] = sqrt(1.0/pow(r,3.0));      
 	fill_utinucon(ucon,geomBL.gg, geomBL.GG);
 
   	//ucon[0] = sqrt((-1.0-geomBL.gg[3][3]*ucon[3]*ucon[3])/geomBL.gg[0][0]);   
 
 
-   pp[UU] = pres/GAMMAM1;
+  pp[UU] = pres/GAMMAM1;
 
-ucon[1]*= ucon[0];
-ucon[2]*= ucon[0];
-ucon[3]*= ucon[0];
+  ucon[1]*= ucon[0];
+  ucon[2]*= ucon[0];
+  ucon[3]*= ucon[0];
 
-fill_utinucon(ucon,geomBL.gg, geomBL.GG);
- //ucon[0]=1./sqrt(-geomBL.GG[0][0])i
- conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG); 
+  fill_utinucon(ucon,geomBL.gg, geomBL.GG);
+  conv_vels(ucon,ucon,VEL4,VELPRIM,geomBL.gg,geomBL.GG); 
 
-//printf("%lf %lf %lf %lf\n",ucon[0],ucon[1],ucon[2],ucon[3]);
+  pp[VX] = ucon[1];
+  pp[VY] = ucon[2];
+  pp[VZ] = ucon[3];
 
- pp[VX] = ucon[1];
- pp[VY] = ucon[2];
- pp[VZ] = ucon[3];
+  //----finish of the HD setup by KK00-------- 
 
-//----finish of the HD setup by KK00-------- 
+  #ifdef RADIATION
+    //distributing pressure
+    ldouble P,aaa,bbb;
+    P=GAMMAM1*uint;
+    //solving for T satisfying P=pgas+prad=bbb T + aaa T^4
+    aaa=4.*SIGMA_RAD/3.;
+    bbb=K_BOLTZ*rho/MU_GAS/M_PROTON;
+    ldouble naw1=cbrt(9*aaa*Power(bbb,2) - Sqrt(3)*Sqrt(27*Power(aaa,2)*Power(bbb,4) + 256*Power(aaa,3)*Power(P,3)));
+    ldouble T4=-Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))/2. + Sqrt((4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 - naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa) + (2*bbb)/(aaa*Sqrt((-4*Power(0.6666666666666666,0.3333333333333333)*P)/naw1 + naw1/(Power(2,0.3333333333333333)*Power(3,0.6666666666666666)*aaa))))/2.;
+
+    E=calc_LTE_EfromT(T4);
+    Fx=Fy=Fz=0.;
+    uint=calc_PEQ_ufromTrho(T4,rho,0,0,0);
+
+    pp[UU]=my_max(uint,ppback[1]);
+    pp[EE0]=my_max(E,ppback[EE0]);
+
+    pp[FX0]=Fx;
+    pp[FY0]=Fy;
+    pp[FZ0]=Fz;
+
+    //transforming from BL lab radiative primitives to code non-ortonormal primitives
+    prad_ff2lab(pp,pp,&geomBL);
+  #endif
 
   trans_pall_coco(pp, pp, KERRCOORDS, MYCOORDS,geomBL.xxvec,&geomBL,&geom);
 
